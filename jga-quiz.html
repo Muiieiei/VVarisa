@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>JGA Bahn-Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f2f2f2; padding: 30px; text-align: center; }
+    .question { font-size: 22px; margin: 20px 0; }
+    .answers button { margin: 10px; padding: 12px 20px; font-size: 16px; cursor: pointer; }
+    #result { font-size: 20px; font-weight: bold; margin-top: 20px; }
+    #level.easy { color: green; font-weight: bold; }
+    #level.schwer { color: darkred; font-weight: bold; }
+    button.next { margin-top: 30px; padding: 12px 30px; font-size: 16px; background: #444; color: #fff; border: none; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+  <h1>🍻 JGA Bahn-Quiz 🎉</h1>
+  <div id="level"></div>
+  <div class="question" id="question"></div>
+  <div class="answers" id="answers"></div>
+  <div id="result"></div>
+  <button class="next" onclick="nextQuestion()">Nächste Frage ➡️</button>
+
+  <script>
+    const questions = [
+      {level:"schwer",text:"Welcher Staat ist flächenmäßig der kleinste der Welt?",options:["Vatikanstadt","Monaco","Liechtenstein","San Marino"],correct:0},
+      {level:"einfach",text:"Wie viele Beine hat ein durchschnittlicher Hund?",options:["2","3","4","6"],correct:2},
+      {level:"schwer",text:"In welchem Jahr landete die Apollo-11-Mission erstmals auf dem Mond?",options:["1965","1967","1969","1972"],correct:2},
+      {level:"einfach",text:"Welches Haustier ist bekannt für das Geräusch 'Miau'?",options:["Hund","Katze","Papagei","Hamster"],correct:1},
+      {level:"schwer",text:"Mit welcher physikalischen Einheit wird elektrische Spannung gemessen?",options:["Ohm","Watt","Volt","Ampere"],correct:2},
+      {level:"einfach",text:"Wie nennt man den Mann, der sich traut?",options:["Bräutigam","Brautvater","Gastgeber","Cousin"],correct:0},
+      {level:"schwer",text:"Welcher dieser Stoffe ist kein klassischer Edelstein?",options:["Saphir","Granit","Rubin","Topas"],correct:1},
+      {level:"einfach",text:"Wie viele Tage hat ein Schaltjahr laut gregorianischem Kalender?",options:["365","366","364","367"],correct:1},
+      {level:"schwer",text:"Welcher Planet hat laut aktuellem Wissensstand die meisten bestätigten Monde?",options:["Mars","Saturn","Jupiter","Neptun"],correct:1},
+      {level:"einfach",text:"Wie nennt man die Frau, die am Tag der Hochzeit im Mittelpunkt steht?",options:["Braut","Gastgeberin","Bräutigam","Brautmutter"],correct:0},
+      {level:"schwer",text:"Wie viele standardisierte Zeitzonen gibt es weltweit?",options:["12","24","38","20"],correct:1},
+      {level:"einfach",text:"Welches Getränk entsteht durch Gärung von Trauben?",options:["Wasser","Wein","Most","Sekt"],correct:1},
+      {level:"schwer",text:"Was bedeutet der Begriff 'Oxymoron'?",options:["Widerspruch in sich","Redewendung","Beleidigung","Sprichwort"],correct:0},
+      {level:"schwer",text:"Wie heißt der längste Knochen im menschlichen Körper?",options:["Schlüsselbein","Oberschenkelknochen","Wadenbein","Wirbelsäule"],correct:1},
+      {level:"einfach",text:"Welcher Ausruf ist in Deutschland beim Anstoßen üblich?",options:["Cheers","Prost","Salut","Skål"],correct:1},
+      {level:"schwer",text:"Welche Stadt ist die älteste dauerhaft bewohnte Stadt der Welt?",options:["Rom","Athen","Jericho","Kairo"],correct:2},
+      {level:"einfach",text:"Was ermöglicht einem Zug, sich auf Schienen fortzubewegen?",options:["Räder","Motorhaube","Schrauben","Flügel"],correct:0},
+      {level:"schwer",text:"Was ist ein Palindrom?",options:["Ein Zahlenspiel","Ein Wort, das rückwärts gleich ist","Ein Tier","Ein Gedicht"],correct:1},
+      {level:"einfach",text:"Welches Werkzeug wird typischerweise zum Öffnen einer Bierflasche verwendet?",options:["Schere","Kapselheber","Löffel","Gabel"],correct:1},
+      {level:"schwer",text:"Wie viele Chromosomen hat ein Mensch?",options:["42","44","46","48"],correct:2},
+      {level:"einfach",text:"Wie viele Tage hat eine Woche?",options:["5","6","7","8"],correct:2},
+      {level:"schwer",text:"Was bedeutet das Wort „Prokrastination“?",options:["Lügen","Zu spät kommen","Aufschieben","Übertreiben"],correct:2},
+      {level:"einfach",text:"Wie nennt man das Getränk aus Trauben?",options:["Bier","Apfelsaft","Wein","Limo"],correct:2},
+      {level:"schwer",text:"Welche Stadt ist die Hauptstadt von Kanada?",options:["Toronto","Montreal","Ottawa","Vancouver"],correct:2},
+      {level:"schwer",text:"Was ist die Hauptstadt von Deutschland?",options:["Berlin","München","Hamburg","Köln"],correct:0},
+      {level:"schwer",text:"Wie lange dauert ein Sonnenjahr (in Tagen)?",options:["360","365","365,25","366"],correct:2},
+      {level:"einfach",text:"Wie nennt man einen Mann, der heiratet?",options:["Bruder","Bräutigam","Papa","Onkel"],correct:1},
+      {level:"schwer",text:"Welches Element hat das chemische Symbol 'Fe'?",options:["Blei","Eisen","Zinn","Fluor"],correct:1},
+      {level:"schwer",text:"Welcher Alkohol ist Hauptbestandteil eines Mojito?",options:["Wodka","Rum","Gin","Tequila"],correct:1},
+      {level:"einfach",text:"Was gehört nicht zu einem Frühstück?",options:["Brötchen","Kaffee","Zahnpasta","Butter"],correct:2}
+    ];
+
+    let current = 0;
+
+    function showQuestion() {
+      const q = questions[current];
+      document.getElementById("question").textContent = q.text;
+      const levelEl = document.getElementById("level");
+      levelEl.textContent = `Frage (${q.level})`;
+      levelEl.className = q.level;
+
+      const answersDiv = document.getElementById("answers");
+      answersDiv.innerHTML = "";
+      q.options.forEach((opt, index) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(index);
+        answersDiv.appendChild(btn);
+      });
+
+      document.getElementById("result").textContent = "";
+    }
+
+    function checkAnswer(index) {
+      const q = questions[current];
+      const result = document.getElementById("result");
+      if (index === q.correct) {
+        result.textContent = "✅ Richtig! Alle anderen trinken!";
+      } else {
+        if (q.level === "einfach") {
+          result.textContent = "❌ Falsch! → Shot für dich!";
+        } else {
+          result.textContent = "❌ Falsch! → 1 Schluck Bier für dich!";
+        }
+      }
+    }
+
+    function nextQuestion() {
+      current = (current + 1) % questions.length;
+      showQuestion();
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
